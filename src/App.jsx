@@ -1,2 +1,1 @@
-import NumberCrunch from './NumberCrunch';
-export default function App() { return <NumberCrunch />; }
+import NumberCrunch from './games/NumberCrunch'; export default function App() { return <NumberCrunch />; } 
