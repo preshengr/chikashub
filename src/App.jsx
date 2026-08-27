@@ -4,9 +4,9 @@ import { useState } from "react";
 // As you build each new game, add its import line below.
 // That's all you need to do at the top of this file.
 import NumberCrunch from "./games/NumberCrunch";
-// import BalloonPopMath    from "./games/BalloonPopMath";
-// import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
+import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
 // import CoinCollector      from "./games/CoinCollector";
+// import BalloonPopMath    from "./games/BalloonPopMath";
 // import PatternBuilder     from "./games/PatternBuilder";
 // import WordScrambleJunior from "./games/WordScrambleJunior";
 // import MissingLetter      from "./games/MissingLetter";
@@ -33,26 +33,17 @@ const GAMES = [
     component: NumberCrunch,
     available: true,
   },
-  {
-    id: "balloon-pop-math",
-    name: "Balloon Pop Math",
-    emoji: "🎈",
-    category: "Mathematics",
-    description: "Pop the balloon showing the correct answer!",
-    skills: "Mental math & reflexes",
-    component: null, // replace null with BalloonPopMath when built
-    available: false,
-  },
-  {
+   {
     id: "shape-sorter-puzzle",
     name: "Shape Sorter",
     emoji: "🔷",
     category: "Mathematics",
     description: "Match falling shapes into the correct slots by count.",
     skills: "Geometry & counting",
-    component: null,
-    available: false,
+    component: ShapeSorterPuzzle,
+    available: true,
   },
+  
   {
     id: "coin-collector",
     name: "Coin Collector",
@@ -61,6 +52,16 @@ const GAMES = [
     description: "Pick the right coins to match the price tag!",
     skills: "Money math & addition",
     component: null,
+    available: false,
+  },
+  {
+    id: "balloon-pop-math",
+    name: "Balloon Pop Math",
+    emoji: "🎈",
+    category: "Mathematics",
+    description: "Pop the balloon showing the correct answer!",
+    skills: "Mental math & reflexes",
+    component: null, // replace null with BalloonPopMath when built
     available: false,
   },
   {

@@ -265,7 +265,7 @@ export default function NumberCrunch() {
       {/* ── HOME SCREEN ─────────────────────────────── */}
       {screen === "home" && (
         <div style={{ textAlign: "center", animation: "slideUp 0.5s ease", maxWidth: 420, width: "100%" }}>
-          <div style={{ fontSize: 72, marginBottom: 8, animation: "pulse 2s ease-in-out infinite" }}>🔢</div>
+          <div style={{ fontSize: 72, marginBottom: 50, animation: "pulse 2s ease-in-out infinite" }}>🔢</div>
           <h1 style={{
             fontSize: 48, fontWeight: 900, color: COLORS.banana, margin: "0 0 6px",
             textShadow: "0 4px 24px rgba(255,233,74,0.5)", letterSpacing: -1,
