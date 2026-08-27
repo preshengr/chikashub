@@ -1,13 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>kids-game</title>
+    <title>Number Adventure</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <div id="app">
+      <header class="topbar">
+        <h1>🚀 Number Adventure</h1>
+        <button id="sound-toggle" class="sound-btn" title="Turn sound on/off">🔊</button>
+      </header>
+
+      <main id="screen" class="screen"></main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
