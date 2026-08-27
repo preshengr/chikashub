@@ -287,7 +287,7 @@ export default function App() {
 
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <div style={{ fontSize: 52, marginBottom: 6 }}>🎮</div>
+        <div style={{ fontSize: 52, marginBottom: 30 }}>🎮</div>
         <h1 style={{
           color: "#ffe94a", fontSize: 36, fontWeight: 900,
           margin: "0 0 6px", letterSpacing: -1,
