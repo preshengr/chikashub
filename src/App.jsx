@@ -1,0 +1,1 @@
+import NumberCrunch from './games/NumberCrunch'; export default function App() { return <NumberCrunch />; } 
