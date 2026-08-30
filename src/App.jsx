@@ -5,7 +5,7 @@ import { useState } from "react";
 // That's all you need to do at the top of this file.
 import NumberCrunch from "./games/NumberCrunch";
 import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
-// import CoinCollector      from "./games/CoinCollector";
+import CoinCollector      from "./games/CoinCollector";
 // import BalloonPopMath    from "./games/BalloonPopMath";
 // import PatternBuilder     from "./games/PatternBuilder";
 // import WordScrambleJunior from "./games/WordScrambleJunior";
@@ -51,8 +51,8 @@ const GAMES = [
     category: "Mathematics",
     description: "Pick the right coins to match the price tag!",
     skills: "Money math & addition",
-    component: null,
-    available: false,
+    component: CoinCollector,
+    available: true,
   },
   {
     id: "balloon-pop-math",
