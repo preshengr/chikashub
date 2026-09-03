@@ -4,9 +4,9 @@ import { useState } from "react";
 // As you build each new game, add its import line below.
 // That's all you need to do at the top of this file.
 import NumberCrunch from "./games/NumberCrunch";
-import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
-import CoinCollector      from "./games/CoinCollector";
 // import BalloonPopMath    from "./games/BalloonPopMath";
+// import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
+// import CoinCollector      from "./games/CoinCollector";
 // import PatternBuilder     from "./games/PatternBuilder";
 // import WordScrambleJunior from "./games/WordScrambleJunior";
 // import MissingLetter      from "./games/MissingLetter";
@@ -33,27 +33,6 @@ const GAMES = [
     component: NumberCrunch,
     available: true,
   },
-   {
-    id: "shape-sorter-puzzle",
-    name: "Shape Sorter",
-    emoji: "🔷",
-    category: "Mathematics",
-    description: "Match falling shapes into the correct slots by count.",
-    skills: "Geometry & counting",
-    component: ShapeSorterPuzzle,
-    available: true,
-  },
-  
-  {
-    id: "coin-collector",
-    name: "Coin Collector",
-    emoji: "🪙",
-    category: "Mathematics",
-    description: "Pick the right coins to match the price tag!",
-    skills: "Money math & addition",
-    component: CoinCollector,
-    available: true,
-  },
   {
     id: "balloon-pop-math",
     name: "Balloon Pop Math",
@@ -62,6 +41,26 @@ const GAMES = [
     description: "Pop the balloon showing the correct answer!",
     skills: "Mental math & reflexes",
     component: null, // replace null with BalloonPopMath when built
+    available: false,
+  },
+  {
+    id: "shape-sorter-puzzle",
+    name: "Shape Sorter",
+    emoji: "🔷",
+    category: "Mathematics",
+    description: "Match falling shapes into the correct slots by count.",
+    skills: "Geometry & counting",
+    component: null,
+    available: false,
+  },
+  {
+    id: "coin-collector",
+    name: "Coin Collector",
+    emoji: "🪙",
+    category: "Mathematics",
+    description: "Pick the right coins to match the price tag!",
+    skills: "Money math & addition",
+    component: null,
     available: false,
   },
   {
@@ -195,6 +194,8 @@ function GameCard({ game, onPlay }) {
       padding: "20px 18px",
       display: "flex",
       flexDirection: "column",
+      alignItems: "center",
+      textAlign: "center",
       gap: 8,
       transition: "all 0.2s ease",
       opacity: game.available ? 1 : 0.55,
@@ -222,8 +223,8 @@ function GameCard({ game, onPlay }) {
       <div style={{ color: "#fff", fontWeight: 800, fontSize: 16, lineHeight: 1.2 }}>{game.name}</div>
       <div style={{
         background: catColor + "22", border: `1px solid ${catColor}55`,
-        borderRadius: 8, padding: "2px 8px", display: "inline-block",
-        color: catColor, fontSize: 11, fontWeight: 700, width: "fit-content",
+        borderRadius: 8, padding: "2px 8px", display: "block",
+        color: catColor, fontSize: 11, fontWeight: 700, width: "fit-content", alignSelf: "center",
       }}>{game.category}</div>
       <div style={{ color: "#c4aeff", fontSize: 12, fontWeight: 600, lineHeight: 1.4 }}>
         {game.description}
@@ -287,7 +288,7 @@ export default function App() {
 
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <div style={{ fontSize: 52, marginBottom: 30 }}>🎮</div>
+        <div style={{ fontSize: 52, marginBottom: 6 }}>🎮</div>
         <h1 style={{
           color: "#ffe94a", fontSize: 36, fontWeight: 900,
           margin: "0 0 6px", letterSpacing: -1,
