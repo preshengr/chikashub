@@ -628,7 +628,7 @@ export default function CoinCollector() {
             background: "linear-gradient(135deg,#FFD700,#FFA500,#FFD700)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
           }}>
-            {score >= 80 ? "Rich Kid!" : score >= 50 ? "Coin Pro!" : "Keep Counting!"}
+            {score >= 80 ? "Rich Kid Wow!" : score >= 50 ? "Coin Pro!" : "Keep Counting!"}
           </h2>
           <p style={{ color: C.warmGray, fontWeight: 700, fontSize: 14, marginBottom: 28 }}>
             {score >= 80
