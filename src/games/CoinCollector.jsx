@@ -30,16 +30,16 @@ const C = {
 
 // ── Coin Denominations ────────────────────────────────────────
 const COINS = [
-  { name:"Quarter", value:25, label:"25¢", bg:"linear-gradient(135deg,#e8c84a,#b8960b,#ffd700)", border:"#B8860B", size:38, textColor:"#5c3d00" },
-  { name:"Dime",    value:10, label:"10¢", bg:"linear-gradient(135deg,#e0e0e0,#a0a0a0,#d0d0d0)", border:"#888",    size:30, textColor:"#333" },
-  { name:"Nickel",  value:5,  label:"5¢",  bg:"linear-gradient(135deg,#c8c8b0,#909080,#bcbcaa)", border:"#808070", size:33, textColor:"#333" },
-  { name:"Penny",   value:1,  label:"1¢",  bg:"linear-gradient(135deg,#e8a060,#8b4513,#cd853f)", border:"#7a3a10", size:28, textColor:"#2d0a00" },
+  { name:"Quarter", value:25, label:"25$", bg:"linear-gradient(135deg,#e8c84a,#b8960b,#ffd700)", border:"#B8860B", size:50, textColor:"#5c3d00" },
+  { name:"Dime",    value:10, label:"10$", bg:"linear-gradient(135deg,#e0e0e0,#a0a0a0,#d0d0d0)", border:"#888",    size:40, textColor:"#333" },
+  { name:"Nickel",  value:5,  label:"5$",  bg:"linear-gradient(135deg,#c8c8b0,#909080,#bcbcaa)", border:"#808070", size:30, textColor:"#333" },
+  { name:"Penny",   value:1,  label:"1$",  bg:"linear-gradient(135deg,#e8a060,#8b4513,#cd853f)", border:"#7a3a10", size:20, textColor:"#2d0a00" },
 ];
 
 const LEVELS = [
-  { label:"Easy",   icon:"🌱", color:"#00C853", max:30,  time:25, maxCoins:5  },
-  { label:"Medium", icon:"⚡", color:"#FFD700", max:75,  time:18, maxCoins:7  },
-  { label:"Hard",   icon:"🔥", color:"#FF3D00", max:150, time:12, maxCoins:10 },
+  { label:"Easy",   icon:"🌱", color:"#00C853", max:50,  time:60, maxCoins:45  },
+  { label:"Medium", icon:"⚡", color:"#FFD700", max:100,  time:40, maxCoins:95  },
+  { label:"Hard",   icon:"🔥", color:"#FF3D00", max:150, time:30, maxCoins:145 },
 ];
 
 const REWARDS = ["🌟","🎉","💰","🤑","🏆","💎","⭐","🪙","🎊","✨"];
