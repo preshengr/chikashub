@@ -632,10 +632,10 @@ export default function CoinCollector() {
           </h2>
           <p style={{ color: C.warmGray, fontWeight: 700, fontSize: 14, marginBottom: 28 }}>
             {score >= 80
-              ? "You matched every price perfectly! 💰🌟"
+              ? "Jackpot! You Matched Every Price Perfectly! 💰🌟"
               : score >= 50
-              ? "Great coin counting! Try again for the jackpot! ✨"
-              : "Every coin master started somewhere! Keep going! 🌱"}
+              ? "Great Coin Counting! Try again for the Jackpot! ✨"
+              : "Every Coin Master Started Somewhere! Keep going! 🌱"}
           </p>
 
           <div style={{
