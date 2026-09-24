@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "framer-motion": "^13.4.2",
+    "howler": "^2.2.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
