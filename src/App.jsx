@@ -1,11 +1,12 @@
 import { useState } from "react";
+import NumberCrunch from "./games/NumberCrunch";
 
 // ── Import your games here ──────────────────────────────────
 // As you build each new game, add its import line below.
 // That's all you need to do at the top of this file.
-import NumberCrunch from "./games/NumberCrunch";
-import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
-import CoinCollector      from "./games/CoinCollector";
+// import NumberCrunch from "./games/NumberCrunch";
+// import ShapeSorterPuzzle from "./games/ShapeSorterPuzzle";
+// import CoinCollector      from "./games/CoinCollector";
 // import BalloonPopMath    from "./games/BalloonPopMath";
 // import PatternBuilder     from "./games/PatternBuilder";
 // import WordScrambleJunior from "./games/WordScrambleJunior";
