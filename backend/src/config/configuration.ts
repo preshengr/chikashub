@@ -16,6 +16,22 @@ export interface AppConfig {
   };
 }
 
+/**
+ * Fail fast when production is misconfigured. Called before Nest bootstraps so
+ * the process exits with a clear message instead of silently using the
+ * in-memory store (which loses every record on restart).
+ */
+export function assertProductionConfig(env: Record<string, string | undefined>): void {
+  const nodeEnv = env.NODE_ENV ?? 'development';
+  const dataStore = env.DATA_STORE ?? 'memory';
+  if (nodeEnv === 'production' && dataStore !== 'firestore') {
+    throw new Error(
+      'DATA_STORE=firestore is required when NODE_ENV=production — the in-memory store ' +
+        'is for local development only and loses all data on restart.',
+    );
+  }
+}
+
 export default registerAs(
   'app',
   (): AppConfig => {

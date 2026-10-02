@@ -1,4 +1,11 @@
-import { getApp, getApps, initializeApp } from 'firebase-admin/app';
+import {
+  cert,
+  getApp,
+  getApps,
+  initializeApp,
+  type AppOptions,
+  type ServiceAccount,
+} from 'firebase-admin/app';
 import { getFirestore, type Firestore, type Query, type Transaction } from 'firebase-admin/firestore';
 import {
   DataExistsError,
@@ -14,11 +21,49 @@ function isAlreadyExists(error: unknown): boolean {
   return code === 6 || code === 'already-exists' || code === 'ALREADY_EXISTS';
 }
 
+/**
+ * Credentials for hosts outside Google Cloud (Railway, a VPS, a laptop):
+ * `FIRESTORE_SERVICE_ACCOUNT` holds the service-account JSON key verbatim.
+ * When unset, firebase-admin falls back to Application Default Credentials —
+ * the metadata server on GCP, or the emulator when FIRESTORE_EMULATOR_HOST is set.
+ */
+function firestoreCredentialOptions(): AppOptions | undefined {
+  const raw = process.env.FIRESTORE_SERVICE_ACCOUNT?.trim();
+  if (!raw) return undefined;
+
+  let account: ServiceAccount & Record<string, unknown>;
+  try {
+    account = JSON.parse(raw) as ServiceAccount & Record<string, unknown>;
+  } catch {
+    throw new Error(
+      'FIRESTORE_SERVICE_ACCOUNT is not valid JSON — paste the service-account key ' +
+        'file contents exactly as downloaded.',
+    );
+  }
+  if (!(account.clientEmail ?? account.client_email) || !(account.privateKey ?? account.private_key)) {
+    throw new Error(
+      'FIRESTORE_SERVICE_ACCOUNT must contain "client_email" and "private_key" ' +
+        '(Firebase console → Project settings → Service accounts).',
+    );
+  }
+  return { credential: cert(account) };
+}
+
 export class FirestoreStore implements DataStore {
   private readonly db: Firestore;
 
   constructor() {
-    const app = getApps().length > 0 ? getApp() : initializeApp();
+    let app;
+    try {
+      app = getApps().length > 0 ? getApp() : initializeApp(firestoreCredentialOptions());
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new Error(
+        `Failed to initialise Cloud Firestore: ${reason}. Outside Google Cloud, set ` +
+          'FIRESTORE_SERVICE_ACCOUNT to the service-account JSON; locally use the ' +
+          'Firestore emulator (FIRESTORE_EMULATOR_HOST) or Application Default Credentials.',
+      );
+    }
     this.db = getFirestore(app);
   }
 

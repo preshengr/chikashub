@@ -79,7 +79,7 @@ docs/          API, database, local storage, privacy, deployment, live deploymen
 - [Browser local storage](docs/local-storage.md)
 - [Privacy & COPPA](docs/privacy-coppa.md)
 - [Setup & deployment](docs/deployment.md)
-- [Live deployment (GitHub + Netlify + App Hosting)](docs/deployment-live.md)
+- [Live deployment (GitHub + Railway + Cloud Firestore)](docs/deployment-live.md)
 
 ## Verification
 

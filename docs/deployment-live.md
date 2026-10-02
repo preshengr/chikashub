@@ -1,40 +1,47 @@
-# Live deployment: GitHub + Netlify + Firebase App Hosting
+# Live deployment: GitHub + Railway + Cloud Firestore
 
-The production architecture is three managed pieces — no VPS, no container upkeep:
+The production architecture is two Railway services built from this one repo,
+plus Cloud Firestore for data:
 
 ```
 browser
-  └── https://<site>.netlify.app            Netlify: static frontend (MPA: index/login/register/dashboard)
-        └── /api/* ──proxy (200)──>  https://<backend>.a.run.app    Firebase App Hosting: NestJS API
-                                              └── Cloud Firestore     data + consent records
+  └── https://<frontend>.up.railway.app      Railway "frontend": Railpack builds
+        │                                      frontend/dist, serves it with Caddy
+        │  cross-origin fetch (VITE_API_BASE)
+        └── https://<backend>.up.railway.app  Railway "backend": NestJS API
+                                               └── Cloud Firestore (service-account auth)
 ```
 
-- The frontend never talks to the backend's URL directly — Netlify proxies `/api/*` to
-  it. Same origin in the browser, so no CORS changes are needed and rate limiting sees
-  the real client IP (with `TRUST_PROXY=true`, set in `apphosting.yaml`).
-- The gateway is **not** deployed. Netlify performs its two jobs: serve `frontend/dist`
-  and proxy `/api`. The backend serves the API only.
+- The frontend and backend are **separate origins**: the browser calls the API at
+  `VITE_API_BASE`, and the backend allows that origin via `CORS_ORIGINS`.
+- The gateway runs **only in local development**. On Railway, static serving and
+  the API are each handled by their own service.
+- Railway injects `PORT` automatically — both `backend` (Nest) and Railpack's Caddy
+  honour it, so no port settings are needed.
 
-Repo config that makes this work (already in the repository):
+Repo configuration involved (all in the repository):
 
 | File | Role |
 | ---- | ---- |
-| `netlify.toml` | build command, publish dir, Node 24, `/api` proxy, named routes, headers |
-| `apphosting.yaml` | build/run commands, Cloud Run sizing, `NODE_ENV`/`DATA_STORE`/`TRUST_PROXY` |
-| `firebase.json`, `firestore.rules`, `firestore.indexes.json`, `.firebaserc` | Firestore rules + emulator config |
+| `apphosting.yaml`, `netlify.toml` | **removed** — previous platform was Netlify + Firebase App Hosting |
+| `firebase.json`, `firestore.rules`, `firestore.indexes.json`, `.firebaserc` | Firestore rules + emulator config (still used) |
+| `frontend/src/core/api.ts` | reads `VITE_API_BASE` at build time |
+
+Service settings (build/start commands, healthchecks) live in the Railway
+dashboard — Railway's file-based config (`railway.json`) is deprecated for new
+services. An optional newer alternative is Infrastructure as Code
+(`.railway/railway.ts` + `railway config apply`); this guide uses the dashboard.
 
 ## Prerequisites
 
-- Node.js 24.x and npm ≥ 11
-- A [GitHub](https://github.com) account
-- A [Netlify](https://netlify.com) account (free tier is enough)
+- Node.js 24.x and npm ≥ 11 locally
+- A [GitHub](https://github.com) account with this repo pushed
+- A [Railway](https://railway.com) account — **a paid plan is required**
+  (Railway has no free tier; the Hobby plan is the minimum)
 - A [Firebase](https://console.firebase.google.com) project on the **Blaze** plan
-  (App Hosting requires Blaze; a small app like this typically stays within the
-  monthly free allowances — watch the billing console the first days)
+  for Cloud Firestore (storage/reads have generous free quotas; watch billing the
+  first days)
 - Firebase CLI: `npm install -g firebase-tools`
-- Git installed and on `PATH`
-
-All commands below run from the repo root.
 
 ## Step 0 — Verify the local gates first
 
@@ -43,184 +50,191 @@ npm install
 npm run typecheck && npm run test && npm run build
 ```
 
-Optional but recommended (needs free ports 3000/3001):
+Optional (needs free ports 3000/3001):
 
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1
 ```
 
-Do not push a commit that fails these gates — both hosts build from the repo.
+Do not push a commit that fails these gates — Railway builds from the repo.
 
 ## Step 1 — Push to GitHub
 
 ```bash
-git init
-git config user.name  "Your Name"          # or use --global
-git config user.email "you@example.com"
 git add .
-git commit -m "Chika's Game Hub"
+git commit -m "Railway deployment setup"
+git push origin main
 ```
 
-Create an empty repository on github.com (private recommended), then:
-
-```bash
-git remote add origin https://github.com/<you>/<repo>.git
-git branch -M main
-git push -u origin main
-```
-
-## Step 2 — Firebase project, Firestore, CLI wiring
+## Step 2 — Firebase project, Firestore, service account
 
 1. [Firebase console](https://console.firebase.google.com) → **Add project**
-   (e.g. `chikas-game-hub`) → disable Google Analytics if you don't need it.
-2. **Upgrade to Blaze** (Plan → Upgrade) — required by App Hosting.
-3. **Build → Firestore Database → Create database** → **Native mode** → pick a region
-   close to your users and close to the App Hosting region you'll choose in Step 4.
+   (e.g. `chikas-game-hub`).
+2. **Upgrade to Blaze** (Plan → Upgrade) — required for Cloud Firestore databases.
+3. **Build → Firestore Database → Create database** → **Native mode** → pick a
+   region close to your users (ideally the same region as the Railway services).
 4. Authenticate the CLI and select the project:
 
    ```bash
    firebase login
-   firebase use --add          # pick the project, give it an alias such as "live"
+   firebase use --add          # pick the project, alias it e.g. "live"
    ```
 
-   This rewrites `.firebaserc` locally with your real project ID (keep it out of
-   forks' way if the repo is public — the ID itself is not a secret, but you can also
-   edit `.firebaserc` by hand).
 5. Deploy the deny-all security rules:
 
    ```bash
    firebase deploy --only firestore
    ```
 
-   These rules block every client SDK from the database; only the backend's Admin SDK
-   (which bypasses rules) touches data. Verify in the console: rules tab shows the
-   deny-all rule.
+   The rules block every client SDK; only the backend's Admin SDK touches data.
+6. **Create the service-account key** the backend will use on Railway:
+   Project settings → **Service accounts** → **Generate new private key**.
+   Save the downloaded JSON file — its entire contents become the
+   `FIRESTORE_SERVICE_ACCOUNT` variable in Step 4. Keep it secret; you can
+   rotate it at any time from the same screen.
 
-## Step 3 — Backend on Firebase App Hosting
+## Step 3 — Create the Railway project and both services
 
-1. Firebase console → **Hosting & Serverless → App Hosting → Create backend**.
-2. Connect GitHub: authorize the Firebase GitHub app; pick your repository and `main`
-   as the live branch.
-3. Configure deployment settings:
-   - **Region**: closest to your users (and ideally to your Firestore region).
-   - **Root directory**: `/` (repo root — this is a monorepo; the workspace flags
-     `npm run build -w backend` / `npm run start:api` are already in `apphosting.yaml`).
-   - Don't add framework presets — App Hosting should see a plain Node app.
-4. Review → **Deploy**. The first rollout takes a few minutes
-   (`npm install` across all workspaces + `tsc`).
-5. When it goes live, copy the backend URL, e.g.
-   `https://chikas-game-hub-abc123-uc.a.run.app`.
-6. Smoke it directly:
+1. [railway.com/new](https://railway.com/new) → **Deploy from GitHub repo** →
+   select this repository. Railway creates your project with a first service —
+   name it **`backend`**.
+2. Add the second service: **Create → Service → GitHub repo** → same repository →
+   name it **`frontend`**.
+3. Configure **backend → Settings**:
 
-   ```
-   https://<backend>/api/games
-   ```
+   | Setting | Value |
+   | ------- | ----- |
+   | Root Directory | `/` (repo root — monorepo, leave default) |
+   | Build Command | `npm run build -w backend` |
+   | Start Command | `npm run start:api` |
+   | Healthcheck Path | `/api/games` |
+   | Region | e.g. `us-west2` — pick one close to you |
 
-   You must get the catalogue JSON envelope. If you get a boot error, open
-   **App Hosting → your backend → Rollout → logs**.
+4. Configure **frontend → Settings**:
 
-The backend reads `apphosting.yaml` from the repo root on every rollout — build
-commands and environment (`NODE_ENV=production`, `DATA_STORE=firestore`,
-`TRUST_PROXY=true`) are versioned, not console state.
+   | Setting | Value |
+   | ------- | ----- |
+   | Root Directory | `/` |
+   | Build Command | `npm run build -w frontend` |
+   | Start Command | *(leave empty — Railpack serves the static build with Caddy)* |
+   | Healthcheck Path | `/` |
+   | Region | same region as `backend` |
 
-## Step 4 — Frontend on Netlify
+5. Generate a public domain for **both** services:
+   **Settings → Networking → Public Networking → Generate Domain**. Copy them:
+   - frontend: `https://<frontend>.up.railway.app`
+   - backend: `https://<backend>.up.railway.app`
 
-1. [Netlify app](https://app.netlify.com) → **Add new site → Import an existing
-   project → GitHub** → pick the repository.
-2. The build settings come from `netlify.toml` (verify, don't change):
-   - Build command: `npm run build -w frontend`
-   - Publish directory: `frontend/dist`
-   - Node version: `24`
-3. **Before the site can work, edit `netlify.toml`**: replace `YOUR_BACKEND_URL` in
-   the `/api/*` redirect with the Step 3 host — host only, no `https://`, no path:
+## Step 4 — Environment variables
 
-   ```toml
-   to = "https://chikas-game-hub-abc123-uc.a.run.app/api/:splat"
-   ```
+### frontend → Variables
 
-   Commit and push; Netlify redeploys automatically:
+| Variable | Value |
+| -------- | ----- |
+| `RAILPACK_SPA_OUTPUT_DIR` | `frontend/dist` — forces Railpack's static (Caddy) mode on that directory |
+| `VITE_API_BASE` | `https://<backend>.up.railway.app` (or `.../api` — both work) |
 
-   ```bash
-   git add netlify.toml
-   git commit -m "Point /api proxy at App Hosting backend"
-   git push
-   ```
+`VITE_API_BASE` is read **at build time** — after changing it, make sure the
+frontend service redeploys (Railway usually does this automatically; otherwise
+click **Redeploy**).
 
-4. Open the site URL Netlify assigned you.
+### backend → Variables
+
+| Variable | Value |
+| -------- | ----- |
+| `DATA_STORE` | `firestore` |
+| `TRUST_PROXY` | `true` — rate limits see real client IPs behind Railway's proxy |
+| `CORS_ORIGINS` | `https://<frontend>.up.railway.app` (exactly this origin, no trailing slash) |
+| `FIRESTORE_SERVICE_ACCOUNT` | paste the **entire contents** of the service-account JSON from Step 2.6 |
+
+Notes:
+
+- **Do not set `NODE_ENV`.** Railway's builder (Railpack) runs the container with
+  `NODE_ENV=production` itself; setting it manually can break the dependency
+  install step (devDependencies such as `typescript` would be skipped).
+- The backend refuses to boot if `NODE_ENV=production` without
+  `DATA_STORE=firestore`, and logs a warning when `CORS_ORIGINS` is missing —
+  both guardrails are in the code.
+- Setting a variable triggers a redeploy; if a build-time variable seems stale,
+  redeploy manually.
 
 ## Step 5 — Verification checklist
 
-Work through this once on every environment change:
-
-- [ ] `https://<site>/` renders the landing page.
-- [ ] `https://<site>/login` and `/register` render (extension-less routes via
-      `netlify.toml` rules) — check the Network tab: document request is 200, not a
-      redirect loop.
-- [ ] Register a real guardian account → confirmation email flow → dashboard.
-- [ ] Login, play, progress persists across logout/login (round-trips through the
-      proxy to Firestore).
-- [ ] `https://<site>/api/games` returns JSON **through the proxy** (the request URL
-      must be the Netlify domain, not the backend domain).
-- [ ] Event logging: dashboard shows recent activity.
-- [ ] Backend logs are clean: App Hosting → Rollouts → logs.
-- [ ] A deliberately wrong path (e.g. `/nope`) returns 404, not a blank page.
+- [ ] `https://<frontend>.up.railway.app/` renders the landing page.
+- [ ] `/login.html` and `/register.html` load (note: links use explicit `.html`
+      paths, which the static server handles natively).
+- [ ] Register a real guardian account → confirmation flow → dashboard.
+- [ ] In the browser DevTools **Network** tab, API requests go to the
+      **backend** domain (from `VITE_API_BASE`) and return 200 — no CORS errors
+      in the console.
+- [ ] `https://<backend>.up.railway.app/api/games` returns the catalogue JSON
+      directly.
+- [ ] Login → play → logout → login: progress persists (round-trip through
+      Firestore).
+- [ ] **backend → Deploy Logs** are clean; the healthcheck passed (deployment
+      shows green, not rolling back).
+- [ ] Intentionally wrong path (`/nope`) returns a 404/SPA fallback, not a crash.
 
 ## Step 6 — Day-to-day deploys
 
-- **Frontend or backend change**: push to `main` → both Netlify and App Hosting
-  auto-deploy. Backend-only changes don't need a Netlify build and vice versa
-  (Netlify only rebuilds when the frontend/workspace files change; you can always
-  trigger a manual **Deploy preview**).
-- **Rules or indexes**: edit `firestore.rules` / `firestore.indexes.json`, then
+- **Push to `main`** → Railway auto-deploys both services (GitHub integration).
+- After changing variables (especially `VITE_API_BASE`), redeploy if Railway
+  doesn't do it for you.
+- **Rules/indexes**: edit `firestore.rules` / `firestore.indexes.json` →
   `firebase deploy --only firestore`.
-- **Backend sizing/env**: edit `apphosting.yaml` and push — no console drift.
-  (Console-set variables override the file; prefer the file so deploys are
-  reproducible.)
+- Optional: set **Watch Paths** per service so backend-only changes don't rebuild
+  the frontend (e.g. backend: `backend/**`, `package*.json`; frontend:
+  `frontend/**`, `package*.json`). Patterns are evaluated from the repo root.
+- Optional: Railway can manage the whole project from one `.railway/railway.ts`
+  file (`railway config init` / `railway config apply` with the Railway CLI).
 
 ## Troubleshooting
 
 | Symptom | Cause / fix |
 | ------- | ----------- |
-| Site loads, but `/api/...` returns Netlify 404 | `YOUR_BACKEND_URL` still placeholder, or the edit wasn't pushed/redeployed. |
-| `/api/...` returns 502 | Backend down or URL wrong → App Hosting logs. First rollout may still be building. |
-| Backend refuses to boot: `DATA_STORE=firestore is required in production` | `env` entry missing/overridden — check console variables vs. `apphosting.yaml`. |
-| Backend build fails with "Cannot find module 'typescript'" | `NODE_ENV=production` leaked into BUILD availability — devDependencies must install during build. Keep `availability: [RUNTIME]`. |
-| Registration/emails fine locally, `PERMISSION_DENIED` live | Firestore rules/database not created in this project — re-run Step 2. |
-| Rate limiting blocks a whole office NAT | Expected per-IP behaviour; tune `RL_*` in `apphosting.yaml` if needed. Behind the proxy the client IP is correct because `TRUST_PROXY=true`. |
-| Named route loops (`/login` ↔ `/login.html`) | Netlify Pretty URL conflict — keep the three `[[redirects]]` rules; they win because they're shadowed correctly (200 rewrite to an existing file terminates). |
-| Works on the deploy preview but not production | You edited `netlify.toml` only on a branch — merge to `main`. |
+| Browser console: CORS error | `CORS_ORIGINS` missing or not the exact frontend origin (scheme + host, no trailing slash). |
+| API requests 404 on the frontend domain | `VITE_API_BASE` unset — the frontend falls back to same-origin `/api`, which the static server doesn't serve. Set the variable and redeploy. |
+| Frontend blank / old bundle | Stale build: `VITE_API_BASE` changed after the last build — redeploy the frontend service. |
+| Backend boot error `DATA_STORE=firestore is required…` | `DATA_STORE` variable missing on the backend service. |
+| Backend boot error `FIRESTORE_SERVICE_ACCOUNT is not valid JSON…` | JSON pasted with truncation/extra text — paste the key file contents exactly; re-download if unsure. |
+| Backend boot error `Failed to initialise Cloud Firestore…` | Key revoked (rotate in Firebase), wrong project, or variable missing. |
+| Build fails: `tsc: command not found` / missing typescript | `NODE_ENV=production` was set manually and pruned devDependencies — remove it. |
+| Deployment 502 "application failed to respond" | App didn't bind Railway's `PORT`, or crashed — check Deploy Logs. If the port looks wrong, verify the healthcheck path matches your routes. |
+| Rate limiting blocks a shared office NAT (429) | Expected per-IP behaviour; tune `RL_AUTH_MAX` / `RL_EVENT_MAX` on the backend if needed. |
+| Registration works but confirmation link wrong | Email links are built from the origin the request arrived on — test the flow through the final frontend domain. |
 
 ## Custom domains
 
-- **Netlify**: Domain management → Add a domain → follow DNS steps (or buy through
-  Netlify). HTTPS is automatic.
-- **Backend**: not needed publicly — only Netlify proxies to it. If you add a custom
-  API domain anyway, also add it to `CORS_ORIGINS`… you don't: same-origin via the
-  proxy keeps CORS out of the picture entirely.
-
-## Alternative: same stack without Netlify
-
-If you'd rather host only on Google: deploy the built frontend with
-`firebase deploy --only hosting` (classic Firebase Hosting, `firebase.json` would
-gain a `hosting` block) and use a rewrite instead of `netlify.toml`:
-
-```json
-"hosting": {
-  "public": "frontend/dist",
-  "rewrites": [{ "source": "/api/**", "run": { "serviceId": "...", "region": "..." } }]
-}
-```
-
-App Hosting's own docs cover [monorepos](https://firebase.google.com/docs/app-hosting/monorepos);
-the Netlify route above is chosen simply because static MPA hosting + a proxy is a
-first-class Netlify feature.
+Both services support custom domains (Settings → Networking → Networking → Custom
+Domain, with the CNAME/TXT records Railway gives you). If the frontend moves to
+`https://play.example.com`, update **both** `CORS_ORIGINS` (backend) and, if the
+API also moves, `VITE_API_BASE` (frontend) — then redeploy.
 
 ## Local parity with production
 
 ```bash
-DATA_STORE=firestore FIRESTORE_EMULATOR_HOST=localhost:8080 npm run dev
+# terminal 1 — Firestore emulator
+firebase emulators:start --only firestore
+
+# terminal 2 — backend against the emulator
+DATA_STORE=firestore FIRESTORE_EMULATOR_HOST=localhost:8080 GCLOUD_PROJECT=demo-chika npm run dev
 ```
 
-with the emulator running (`firebase emulators:start --only firestore`). Six backend
-tests are written against the emulator and skip automatically when it isn't running
-(see `backend/test/firestore.store.spec.ts`).
+or plain in-memory dev (default): `npm run dev` (gateway on :3000, API on :3001,
+Vite on :5173). The six Firestore parity tests
+(`backend/src/database/firestore.store.spec.ts`) run automatically when
+`FIRESTORE_EMULATOR_HOST` is set and skip otherwise.
+
+## Why the previous setup was replaced
+
+The Netlify + Firebase App Hosting configuration (`netlify.toml`,
+`apphosting.yaml`) was removed when the platform moved to Railway. The current
+equivalents:
+
+| Concern | Netlify + App Hosting | Railway |
+| ------- | --------------------- | ------- |
+| Frontend hosting | Netlify static + `/api` proxy | Railpack static mode (Caddy) on the `frontend` service |
+| API URL coupling | same-origin (proxy) | `VITE_API_BASE` + `CORS_ORIGINS` (cross-origin) |
+| Backend runtime | App Hosting (Cloud Run) | Railway `backend` service, `PORT` injected |
+| Build/start config | versioned in repo files | Railway dashboard (per-service settings) |
+| Data | Cloud Firestore | Cloud Firestore (unchanged, via `FIRESTORE_SERVICE_ACCOUNT`) |

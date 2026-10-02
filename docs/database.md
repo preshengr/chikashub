@@ -117,6 +117,7 @@ Updated read-modify-write inside the same transaction that appends the event.
 | Variable | Values | Notes |
 | -------- | ------ | ----- |
 | `DATA_STORE` | `memory` \| `firestore` | defaults to `memory`; boot fails if `NODE_ENV=production` without `firestore` |
+| `FIRESTORE_SERVICE_ACCOUNT` | service-account JSON | required for `firestore` outside Google Cloud (e.g. Railway); unset locally/ADC otherwise |
 | `PENDING_TTL_MINUTES` | number | staged registration window (default 30) |
 | `SESSION_TTL_HOURS` | number | session lifetime (default 24) |
 

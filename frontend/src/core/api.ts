@@ -1,6 +1,18 @@
 import type { ValidationDetail } from './types';
 
-export const API_BASE = '/api';
+/**
+ * API prefix. Local dev and same-origin deployments use the gateway proxy
+ * (`/api`). On hosts where the frontend and backend are separate origins
+ * (e.g. two Railway services), set `VITE_API_BASE` at build time to the
+ * backend origin (`https://<backend>.up.railway.app`) or its full API base.
+ */
+function resolveApiBase(): string {
+  const raw = (import.meta.env.VITE_API_BASE ?? '').trim().replace(/\/+$/, '');
+  if (!raw) return '/api';
+  return raw.endsWith('/api') ? raw : `${raw}/api`;
+}
+
+export const API_BASE = resolveApiBase();
 
 export class ApiError extends Error {
   constructor(

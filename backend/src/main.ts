@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import appConfig, { type AppConfig } from './config/configuration';
+import appConfig, { assertProductionConfig, type AppConfig } from './config/configuration';
 
 /**
  * Bootstrap the NestJS HTTP server.
@@ -16,6 +16,7 @@ import appConfig, { type AppConfig } from './config/configuration';
  */
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
+  assertProductionConfig(process.env);
 
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug'],
@@ -24,6 +25,14 @@ async function bootstrap(): Promise<void> {
   // registerAs() factories are registered as providers under their KEY token.
   const config = app.get<AppConfig>(appConfig.KEY as string);
   const { port, apiPrefix, corsOrigins, trustProxy, env } = config;
+
+  if (env === 'production' && process.env.CORS_ORIGINS === undefined) {
+    logger.warn(
+      'CORS_ORIGINS is unset — falling back to localhost origins. Set it to your ' +
+        'frontend origin (e.g. https://<site>.up.railway.app) when the browser calls ' +
+        'this API cross-origin.',
+    );
+  }
 
   app.setGlobalPrefix(apiPrefix);
   app.enableShutdownHooks();

@@ -58,6 +58,7 @@ overriding. Otherwise expose the backend privately and point `API_TARGET` at it.
 | `PORT` | `3001` | API listen port |
 | `API_PREFIX` | `api` | global route prefix |
 | `DATA_STORE` | `memory` | `memory` (local/tests) \| `firestore` (required in production) |
+| `FIRESTORE_SERVICE_ACCOUNT` | — | service-account JSON (required for `firestore` outside Google Cloud, e.g. Railway) |
 | `SESSION_TTL_HOURS` | `24` | session lifetime |
 | `PENDING_TTL_MINUTES` | `30` | registration confirm window |
 | `CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000` | comma-separated allow-list |
@@ -74,6 +75,12 @@ overriding. Otherwise expose the backend privately and point `API_TARGET` at it.
 | `API_TARGET` | `http://localhost:3001` | backend upstream for `/api` |
 | `FRONTEND_DIR` | `frontend/dist` | static files root |
 | `DEV_TARGET` | `http://localhost:5173` | Vite upstream when `frontend/dist` is missing |
+
+### Frontend (`frontend`)
+
+| Variable | Default | Purpose |
+| -------- | ------- | ------- |
+| `VITE_API_BASE` | `/api` (same-origin) | backend origin or full API base at build time when the API is cross-origin (e.g. `https://<backend>.up.railway.app`) |
 
 ## Smoke test
 
@@ -106,5 +113,5 @@ npm run typecheck && npm run test && npm run build
   records.
 - The gateway already sends security headers and a typed 502 envelope; put it behind
   a conventional reverse proxy (nginx/Caddy) for TLS and gzip if needed.
-- For the managed live setup (GitHub + Netlify + Firebase App Hosting), follow the
+- For the managed live setup (GitHub + Railway + Cloud Firestore), follow the
   [live deployment guide](deployment-live.md).
