@@ -6,7 +6,13 @@ import {
   type AppOptions,
   type ServiceAccount,
 } from 'firebase-admin/app';
-import { getFirestore, type Firestore, type Query, type Transaction } from 'firebase-admin/firestore';
+import {
+  getFirestore,
+  type Firestore,
+  type Query,
+  type QueryDocumentSnapshot,
+  type Transaction,
+} from 'firebase-admin/firestore';
 import {
   DataExistsError,
   type DataStore,
@@ -111,7 +117,7 @@ export class FirestoreStore implements DataStore {
       query = query.limit(options.limit);
     }
     const snapshot = await query.get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() as T }));
+    return snapshot.docs.map((doc: QueryDocumentSnapshot) => ({ id: doc.id, data: doc.data() as T }));
   }
 
   async deleteMany(paths: string[]): Promise<void> {
@@ -126,7 +132,9 @@ export class FirestoreStore implements DataStore {
   }
 
   async runTransaction<T>(fn: (tx: StoreScope) => Promise<T>): Promise<T> {
-    return this.db.runTransaction((transaction) => fn(new TransactionScope(transaction, this.db)));
+    return this.db.runTransaction((transaction: Transaction) =>
+      fn(new TransactionScope(transaction, this.db)),
+    );
   }
 }
 
