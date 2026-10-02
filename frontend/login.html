@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Members Login — Chika's Game Hub</title>
+    <meta name="description" content="Sign in to Chika's Game Hub with your play username." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/login.css" />
+    <script type="module" src="/src/pages/login.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="topnav">
+      <a class="brand" href="index.html" aria-label="Chika's Game Hub home">Chika's Game Hub</a>
+      <nav aria-label="Primary">
+        <ul class="topnav__links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#games">Games</a></li>
+          <li><a href="register.html">Registration</a></li>
+          <li><a href="login.html" aria-current="page">Login</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--primary btn--small" href="register.html">New User</a>
+    </header>
+
+    <main id="main" class="login">
+      <section class="login__card card" aria-labelledby="login-title">
+        <span class="login__icon" aria-hidden="true">🕹️</span>
+        <h1 class="section-title" id="login-title">Members Login</h1>
+        <p class="section-sub">Type the play username you got when you registered.</p>
+
+        <div class="form-summary" id="login-summary" tabindex="-1" role="alert"></div>
+
+        <form id="login-form" class="form-grid" novalidate>
+          <div class="field">
+            <label for="username">Play username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              spellcheck="false"
+              autocapitalize="none"
+              placeholder="chi00000"
+              maxlength="64"
+              aria-describedby="hint-username err-username"
+            />
+            <span class="hint" id="hint-username">Looks like <strong>chi12345</strong> — three letters and five digits.</span>
+            <p class="error-text" id="err-username"></p>
+          </div>
+          <button type="submit" class="btn btn--primary btn--block" id="login-btn">
+            Enter the Arcade 🎮
+          </button>
+        </form>
+
+        <p class="login__note">
+          New here? <a href="register.html">Create an account</a> — it takes about two minutes.
+        </p>
+      </section>
+
+      <section class="login__storage card" aria-labelledby="storage-title">
+        <h2 class="section-title storage-title" id="storage-title">Local Progress Storage</h2>
+        <p class="section-sub">
+          High scores and level progress are saved in this browser only — no tracking, no
+          third-party cookies.
+        </p>
+
+        <div class="storage-bar" role="img" id="storage-bar" aria-label="Storage usage">
+          <span class="storage-bar__fill" id="storage-fill"></span>
+        </div>
+        <p class="storage-readout" id="storage-readout">Measuring storage…</p>
+        <ul class="storage-stats" id="storage-stats"></ul>
+
+        <div class="storage-actions">
+          <button type="button" class="btn btn--danger" id="reset-btn">Reset Progress</button>
+          <button type="button" class="btn btn--ghost btn--small" id="refresh-quota">Refresh</button>
+        </div>
+        <p class="hint" id="storage-warning" hidden>
+          This browser is blocking local storage — progress will disappear when the tab closes.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>Chika's Game Hub — play safe, play kind.</div>
+      <div class="site-footer__links">
+        <a href="index.html">Home</a>
+        <a href="register.html">Registration</a>
+        <span>COPPA-friendly</span>
+      </div>
+      <div>© <span id="year"></span> Chika's Game Hub</div>
+    </footer>
+
+    <div class="modal-overlay" id="reset-modal" hidden>
+      <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="reset-modal-title" aria-describedby="reset-modal-body">
+        <button type="button" class="modal__close" id="reset-cancel" aria-label="Cancel reset">×</button>
+        <h2 class="modal__title" id="reset-modal-title">Reset all progress?</h2>
+        <p id="reset-modal-body">
+          This permanently deletes every saved level, score and heart count for
+          <strong>this browser</strong>. There is no backup — you will restart games from level 1.
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="reset-keep">Keep my progress</button>
+          <button type="button" class="btn btn--danger" id="reset-confirm">Yes, reset it</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

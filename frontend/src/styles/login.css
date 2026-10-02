@@ -1,0 +1,126 @@
+/* Login page */
+
+.login {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: clamp(20px, 3vw, 34px);
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 64px) clamp(16px, 4vw, 40px) 40px;
+}
+
+.login__card {
+  padding: clamp(24px, 4vw, 44px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login__card::before {
+  content: '';
+  position: absolute;
+  top: -70px;
+  right: -70px;
+  width: 220px;
+  height: 220px;
+  background: var(--pink);
+  filter: blur(80px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.login__icon {
+  display: inline-block;
+  font-size: 58px;
+  animation: floaty 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 16px rgba(255, 47, 214, 0.5));
+}
+
+.login__card .form-grid {
+  text-align: left;
+  margin-top: 18px;
+}
+
+.login__card .form-summary {
+  text-align: left;
+  margin-top: 14px;
+}
+
+.login__card .form-summary.is-error {
+  border-color: var(--danger);
+  background: rgba(255, 84, 112, 0.14);
+  color: var(--danger);
+}
+
+.login__note {
+  margin-top: 20px;
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+/* ---------- Storage panel ---------- */
+
+.login__storage {
+  padding: clamp(22px, 4vw, 40px);
+}
+
+.storage-title {
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.storage-bar {
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.storage-bar__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--lime), var(--cyan), var(--pink));
+  background-size: 200% 100%;
+  animation: progress-shimmer 2.6s linear infinite;
+  transition: width 0.5s ease;
+}
+
+.storage-readout {
+  margin: 12px 0 6px;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.storage-stats {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+.storage-stats strong {
+  color: var(--ink);
+}
+
+.storage-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#storage-warning {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 2px dashed var(--yellow);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 233, 60, 0.08);
+  color: var(--yellow);
+  font-weight: 700;
+}

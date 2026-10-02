@@ -1,0 +1,333 @@
+/* Game dashboard */
+
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 40px) clamp(14px, 4vw, 48px) 40px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.5vw, 28px);
+}
+
+.dashboard[hidden] {
+  display: none;
+}
+
+.topnav__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topnav__player {
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+/* ---------- Hero ---------- */
+
+.dash-hero {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(20px, 3vw, 34px);
+  background: linear-gradient(135deg, rgba(139, 92, 255, 0.28), rgba(255, 47, 214, 0.18));
+}
+
+.dash-hero__who {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.dash-hero__avatar {
+  display: grid;
+  place-items: center;
+  width: clamp(64px, 9vw, 92px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, 46px);
+  color: #16093c;
+  background: linear-gradient(135deg, var(--yellow), var(--pink));
+  box-shadow: 0 0 24px rgba(255, 233, 60, 0.5);
+}
+
+.dash-hero__greeting {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 40px);
+  color: var(--yellow);
+}
+
+.dash-hero__meta {
+  margin: 4px 0 8px;
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
+.dash-hero__goals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dash-hero__side {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.dash-hero__date {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+.dash-hero__clock {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 34px);
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+/* ---------- Stats ---------- */
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.stat {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.stat--wide {
+  grid-column: span 2;
+}
+
+.stat__value {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 38px);
+  color: var(--lime);
+}
+
+.stat__label {
+  font-size: 13.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-dim);
+}
+
+.dash-status {
+  color: var(--ink-dim);
+  text-align: center;
+  font-weight: 700;
+}
+
+.dash-status.is-error {
+  color: var(--danger);
+}
+
+/* ---------- Sections ---------- */
+
+.dash-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dash-section__head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  border-bottom: 2px dashed rgba(34, 230, 255, 0.35);
+  padding-bottom: 8px;
+}
+
+.dash-section__title {
+  margin: 0;
+  font-size: clamp(21px, 3vw, 30px);
+  color: var(--cyan);
+}
+
+.dash-section__count {
+  color: var(--ink-dim);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: clamp(14px, 2vw, 22px);
+}
+
+/* ---------- Game cards ---------- */
+
+.dash-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(38, 20, 92, 0.92), rgba(18, 10, 48, 0.92));
+  border: 2px solid var(--card-accent, var(--violet));
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.dash-card::after {
+  content: '';
+  position: absolute;
+  right: -40px;
+  bottom: -60px;
+  width: 160px;
+  height: 160px;
+  background: var(--card-accent, var(--violet));
+  filter: blur(55px);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.dash-card:hover,
+.dash-card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--card-accent, var(--violet)) 60%, transparent);
+}
+
+.dash-card__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-card__icon {
+  font-size: 40px;
+}
+
+.dash-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 21px;
+  color: var(--card-accent, var(--yellow));
+}
+
+.dash-card__tagline {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: 14.5px;
+  min-height: 2.6em;
+}
+
+.dash-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dash-card__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.dash-card__progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink-dim);
+}
+
+.dash-card__play {
+  margin-top: 6px;
+}
+
+/* ---------- Instructions modal ---------- */
+
+.instructions__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.instructions__icon {
+  font-size: 52px;
+}
+
+.instructions__tagline {
+  margin: 0;
+  color: var(--ink-dim);
+}
+
+.instructions__list {
+  margin: 18px 0;
+  padding-left: 24px;
+  display: grid;
+  gap: 10px;
+  font-size: 16.5px;
+}
+
+.instructions__list li::marker {
+  color: var(--pink);
+  font-weight: 800;
+}
+
+.instructions__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.instructions__hearts {
+  margin-top: 14px;
+  font-weight: 700;
+  color: var(--pink);
+}
+
+.linklike {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.linklike:hover {
+  color: var(--cyan);
+}
+
+#game-mount:not([hidden]) {
+  display: block;
+}
+
+body.is-playing .dashboard,
+body.is-playing .site-footer {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .stat--wide {
+    grid-column: span 1;
+  }
+
+  .dash-hero__side {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

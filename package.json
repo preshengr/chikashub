@@ -1,0 +1,29 @@
+{
+  "name": "chikas-game-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chika's Game Hub - educational gaming platform for children ages 4-12",
+  "workspaces": [
+    "gateway",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,gateway,web -c magenta,cyan,green \"npm run dev -w backend\" \"npm run dev -w gateway\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend && npm run build -w gateway",
+    "start": "npm run start -w gateway",
+    "start:api": "npm run start -w backend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend && npm run typecheck -w gateway",
+    "test": "npm run test -w backend && npm run test -w frontend && npm run test -w gateway",
+    "test:backend": "npm run test -w backend",
+    "test:frontend": "npm run test -w frontend",
+    "test:gateway": "npm run test -w gateway"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chika's Game Hub — Play, Learn, Shine!</title>
+    <meta
+      name="description"
+      content="Chika's Game Hub is a kid-friendly neon game arcade for ages 4-12 with math, reading, science, art and coding games."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/landing.css" />
+    <script type="module" src="/src/pages/landing.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="topnav">
+      <a class="brand" href="index.html" aria-label="Chika's Game Hub home">Chika's Game Hub</a>
+      <nav aria-label="Primary">
+        <ul class="topnav__links">
+          <li><a href="index.html" aria-current="page">Home</a></li>
+          <li><a href="#games">Games</a></li>
+          <li><a href="register.html">Registration</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+      <form class="topnav__search" id="subscribe-form" novalidate>
+        <label for="subscribe-email">Get new game alerts</label>
+        <input
+          id="subscribe-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="grown-up@email.com"
+          aria-describedby="subscribe-note"
+        />
+        <button class="btn btn--cyan btn--small" type="submit">Subscribe</button>
+        <span id="subscribe-note" class="visually-hidden">Newsletter preview only - nothing is sent yet.</span>
+      </form>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__bg" role="img" aria-label="Neon playground under the stars"></div>
+        <div class="hero__scrim"></div>
+        <div class="hero__content">
+          <p class="hero__eyebrow">Ages 4–12 · Safe · COPPA-minded</p>
+          <h1 id="hero-title">Welcome to Chika's Game Hub!</h1>
+          <p class="hero__subtitle">
+            Blast into 13 neon-powered learning adventures in math, reading, science, art and
+            coding — pick a team, earn hearts and become a playground champion.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="register.html">New User</a>
+            <a class="btn btn--cyan" href="login.html">Members Login</a>
+          </div>
+        </div>
+        <div class="hero__hint" aria-hidden="true">▼</div>
+      </section>
+
+      <section class="games" id="games" aria-labelledby="games-title">
+        <h2 class="section-title" id="games-title">Choose Your Next Adventure</h2>
+        <p class="section-sub" id="games-status">Loading the game shelf…</p>
+        <div class="games__grid" id="games-grid"></div>
+        <div class="offline-note" id="offline-note" hidden>
+          <strong>Playing offline preview.</strong> We could not reach the game server, so we are
+          showing the bundled catalogue. <button type="button" class="btn btn--ghost btn--small" id="retry-catalog">Try again</button>
+        </div>
+      </section>
+
+      <section class="showcase" aria-labelledby="showcase-title">
+        <h2 class="section-title" id="showcase-title">See The Games In Action</h2>
+        <p class="section-sub">Watch 30 seconds of each game — they play all by themselves!</p>
+        <div class="showcase__stage card">
+          <div class="showcase__scene" id="showcase-scene" aria-live="off"></div>
+          <div class="showcase__meta">
+            <div>
+              <h3 class="showcase__title" id="showcase-title-text">Loading…</h3>
+              <p class="showcase__caption" id="showcase-caption"></p>
+            </div>
+            <div class="showcase__controls">
+              <button type="button" class="btn btn--ghost btn--small" id="showcase-prev" aria-label="Previous game sample">◀</button>
+              <span class="showcase__counter" id="showcase-counter"></span>
+              <button type="button" class="btn btn--ghost btn--small" id="showcase-next" aria-label="Next game sample">▶</button>
+            </div>
+          </div>
+          <div class="showcase__timer" aria-hidden="true"><span id="showcase-timer-fill"></span></div>
+        </div>
+      </section>
+
+      <section class="cta" aria-labelledby="cta-title">
+        <div class="cta__panel card">
+          <h2 class="section-title" id="cta-title">Ready, Player One?</h2>
+          <p>Grown-ups set up the account in two minutes. Kids just press play.</p>
+          <div class="cta__actions">
+            <a class="btn btn--lime" href="register.html">Create an account</a>
+            <a class="btn btn--ghost" href="login.html">I already have one</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>Chika's Game Hub</strong> — a neon playground for curious kids.
+      </div>
+      <div class="site-footer__links">
+        <a href="register.html">Registration</a>
+        <a href="login.html">Members Login</a>
+        <a href="#games">Games</a>
+        <span title="No third-party trackers. Parental consent required for accounts.">COPPA-friendly</span>
+      </div>
+      <div>© <span id="year"></span> Chika's Game Hub</div>
+    </footer>
+
+    <div class="modal-overlay" id="game-modal" hidden>
+      <div class="modal modal--wide" role="dialog" aria-modal="true" aria-labelledby="game-modal-title">
+        <button type="button" class="modal__close" data-close aria-label="Close game details">×</button>
+        <div class="game-modal__head">
+          <span class="game-modal__icon" id="game-modal-icon" aria-hidden="true"></span>
+          <div>
+            <h2 class="modal__title" id="game-modal-title"></h2>
+            <p class="game-modal__tagline" id="game-modal-tagline"></p>
+          </div>
+        </div>
+        <div class="slides" id="game-modal-slides">
+          <div class="slides__stage" id="game-modal-slide-stage"></div>
+          <div class="slides__controls">
+            <button type="button" class="slides__nav" data-slides="prev" aria-label="Previous slide">‹</button>
+            <div class="slides__dots" id="game-modal-dots"></div>
+            <button type="button" class="slides__nav" data-slides="next" aria-label="Next slide">›</button>
+          </div>
+        </div>
+        <p class="game-modal__description" id="game-modal-description"></p>
+        <div class="game-modal__meta" id="game-modal-meta"></div>
+        <div class="modal__actions">
+          <a class="btn btn--primary" id="game-modal-play" href="register.html">Play this game</a>
+          <button type="button" class="btn btn--ghost" data-close>Keep browsing</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

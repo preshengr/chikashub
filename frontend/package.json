@@ -1,0 +1,27 @@
+{
+  "name": "@chika/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chika's Game Hub frontend (Vite + TypeScript)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@fontsource/gloria-hallelujah": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
+    "@fontsource/sacramento": "^5.3.0"
+  }
+}

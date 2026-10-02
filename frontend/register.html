@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account — Chika's Game Hub</title>
+    <meta name="description" content="Set up a Chika's Game Hub account for your child in four quick steps." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/register.css" />
+    <script type="module" src="/src/pages/register.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="topnav">
+      <a class="brand" href="index.html" aria-label="Chika's Game Hub home">Chika's Game Hub</a>
+      <nav aria-label="Primary">
+        <ul class="topnav__links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#games">Games</a></li>
+          <li><a href="register.html" aria-current="page">Registration</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--ghost btn--small" href="login.html">Members Login</a>
+    </header>
+
+    <main id="main" class="register">
+      <!-- Intro: teacher walks in and writes the heading, then the form slides in -->
+      <div class="intro" id="intro" aria-hidden="true">
+        <div class="intro__board">
+          <p class="intro__writing" id="intro-writing">Create Account</p>
+          <span class="intro__chalk" aria-hidden="true"></span>
+        </div>
+        <div class="teacher" aria-hidden="true">
+          <span class="teacher__head"></span>
+          <span class="teacher__hair"></span>
+          <span class="teacher__body"></span>
+          <span class="teacher__arm"></span>
+          <span class="teacher__leg teacher__leg--left"></span>
+          <span class="teacher__leg teacher__leg--right"></span>
+          <span class="teacher__book">📘</span>
+        </div>
+        <button type="button" class="btn btn--ghost btn--small intro__skip" id="intro-skip">
+          Skip intro
+        </button>
+      </div>
+
+      <section class="register__stage" id="stage" aria-labelledby="register-title">
+        <div class="register__panel card">
+          <div class="register__head">
+            <div>
+              <h1 class="section-title" id="register-title">Create Account</h1>
+              <p class="section-sub">Four quick steps — grown-ups only, please.</p>
+            </div>
+            <button type="button" class="btn btn--ghost btn--small" id="replay-intro" title="Replay the intro animation">
+              Replay intro
+            </button>
+          </div>
+
+          <ol class="steps" id="steps" aria-label="Registration progress">
+            <li class="steps__item is-active" data-step="1"><span>1</span> The Grown-Up</li>
+            <li class="steps__item" data-step="2"><span>2</span> The Player</li>
+            <li class="steps__item" data-step="3"><span>3</span> Learning Goals</li>
+            <li class="steps__item" data-step="4"><span>4</span> Permission</li>
+          </ol>
+
+          <form id="register-form" novalidate autocomplete="on">
+            <div class="form-summary" id="form-summary" tabindex="-1" role="alert"></div>
+
+            <!-- Step 1 -->
+            <fieldset class="fieldset step-panel is-active" data-panel="1">
+              <legend>About the grown-up</legend>
+              <div class="form-grid two-col">
+                <div class="field">
+                  <label for="parentFirstName">First name</label>
+                  <input id="parentFirstName" name="parentFirstName" type="text" autocomplete="given-name" maxlength="60" aria-describedby="err-parentFirstName" />
+                  <p class="error-text" id="err-parentFirstName"></p>
+                </div>
+                <div class="field">
+                  <label for="parentLastName">Last name</label>
+                  <input id="parentLastName" name="parentLastName" type="text" autocomplete="family-name" maxlength="60" aria-describedby="err-parentLastName" />
+                  <p class="error-text" id="err-parentLastName"></p>
+                </div>
+                <div class="field">
+                  <label for="relationship">Relationship to child</label>
+                  <select id="relationship" name="relationship" aria-describedby="err-relationship">
+                    <option value="">Choose one…</option>
+                    <option value="mother">Mother</option>
+                    <option value="father">Father</option>
+                    <option value="legal_guardian">Legal Guardian</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <p class="error-text" id="err-relationship"></p>
+                </div>
+                <div class="field">
+                  <label for="parentEmail">Email</label>
+                  <input id="parentEmail" name="parentEmail" type="email" autocomplete="email" maxlength="254" aria-describedby="hint-parentEmail err-parentEmail" />
+                  <span class="hint" id="hint-parentEmail">Used for account recovery only.</span>
+                  <p class="error-text" id="err-parentEmail"></p>
+                </div>
+                <div class="field">
+                  <label for="parentPhone">Phone (optional)</label>
+                  <input id="parentPhone" name="parentPhone" type="tel" autocomplete="tel" maxlength="20" aria-describedby="err-parentPhone" />
+                  <p class="error-text" id="err-parentPhone"></p>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn--cyan" data-next="2">Continue →</button>
+              </div>
+            </fieldset>
+
+            <!-- Step 2 -->
+            <fieldset class="fieldset step-panel" data-panel="2" hidden>
+              <legend>About the player</legend>
+              <div class="form-grid two-col">
+                <div class="field">
+                  <label for="childFirstName">Child's first name</label>
+                  <input id="childFirstName" name="childFirstName" type="text" maxlength="60" aria-describedby="err-childFirstName" />
+                  <p class="error-text" id="err-childFirstName"></p>
+                </div>
+                <div class="field">
+                  <label for="childAge">Age</label>
+                  <select id="childAge" name="childAge" aria-describedby="err-childAge">
+                    <option value="">Choose an age…</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                  </select>
+                  <p class="error-text" id="err-childAge"></p>
+                </div>
+                <div class="field">
+                  <label for="childGrade">School grade</label>
+                  <select id="childGrade" name="childGrade" aria-describedby="err-childGrade">
+                    <option value="">Choose a grade…</option>
+                    <option value="pre_k">Pre-K</option>
+                    <option value="kindergarten">Kindergarten</option>
+                    <option value="grade_1">1st Grade</option>
+                    <option value="grade_2">2nd Grade</option>
+                    <option value="grade_3">3rd Grade</option>
+                    <option value="grade_4">4th Grade</option>
+                    <option value="grade_5">5th Grade</option>
+                  </select>
+                  <p class="error-text" id="err-childGrade"></p>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn--ghost" data-back="1">← Back</button>
+                <button type="button" class="btn btn--cyan" data-next="3">Continue →</button>
+              </div>
+            </fieldset>
+
+            <!-- Step 3 -->
+            <fieldset class="fieldset step-panel" data-panel="3" hidden>
+              <legend>Learning goals</legend>
+              <div class="field">
+                <span class="label-text" id="goals-label">Pick 1 or 2 goals (max 2)</span>
+                <div class="choice-grid" role="group" aria-labelledby="goals-label" aria-describedby="err-preferencesLearningGoals">
+                  <label class="choice"><input type="checkbox" name="learningGoals" value="math" /> 🧮 Mathematics &amp; Logic</label>
+                  <label class="choice"><input type="checkbox" name="learningGoals" value="reading" /> 📚 Reading &amp; Literacy</label>
+                  <label class="choice"><input type="checkbox" name="learningGoals" value="science" /> 🔬 Science &amp; Exploration</label>
+                  <label class="choice"><input type="checkbox" name="learningGoals" value="creativity" /> 🎨 Creativity &amp; Art</label>
+                  <label class="choice"><input type="checkbox" name="learningGoals" value="coding" /> 🤖 Critical Thinking &amp; Coding</label>
+                </div>
+                <p class="error-text" id="err-preferencesLearningGoals"></p>
+              </div>
+              <div class="form-grid two-col">
+                <div class="field">
+                  <label for="readingLevel">Reading level</label>
+                  <select id="readingLevel" name="readingLevel" aria-describedby="err-preferencesReadingLevel">
+                    <option value="">Choose a level…</option>
+                    <option value="pre_reader">Pre-reader (audio/visuals primary)</option>
+                    <option value="early_reader">Early Reader (short, simple words)</option>
+                    <option value="independent_reader">Independent Reader (full sentences)</option>
+                  </select>
+                  <p class="error-text" id="err-preferencesReadingLevel"></p>
+                </div>
+                <div class="field">
+                  <span class="label-text" id="style-label">Gameplay style</span>
+                  <div class="choice-grid" role="radiogroup" aria-labelledby="style-label" aria-describedby="err-preferencesGameplayStyle">
+                    <label class="choice"><input type="radio" name="gameplayStyle" value="story" /> 📖 Story-driven</label>
+                    <label class="choice"><input type="radio" name="gameplayStyle" value="action" /> 🕹️ Action arcade</label>
+                    <label class="choice"><input type="radio" name="gameplayStyle" value="relaxed" /> 🌿 Relaxed free-play</label>
+                  </div>
+                  <p class="error-text" id="err-preferencesGameplayStyle"></p>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn--ghost" data-back="2">← Back</button>
+                <button type="button" class="btn btn--cyan" data-next="4">Continue →</button>
+              </div>
+            </fieldset>
+
+            <!-- Step 4 -->
+            <fieldset class="fieldset step-panel" data-panel="4" hidden>
+              <legend>Permission &amp; consent</legend>
+              <div class="field">
+                <label class="choice choice--wide">
+                  <input type="checkbox" id="consentData" name="consentData" aria-describedby="err-consentConsentData" />
+                  I am the parent or legal guardian, and I consent to Chika's Game Hub storing my
+                  child's first name, age, grade and game progress for this account.
+                </label>
+                <p class="error-text" id="err-consentConsentData"></p>
+                <label class="choice choice--wide">
+                  <input type="checkbox" id="termsConsent" name="termsConsent" aria-describedby="err-consentTermsConsent" />
+                  I agree to the Terms of Service and the Privacy Policy.
+                </label>
+                <p class="error-text" id="err-consentTermsConsent"></p>
+              </div>
+              <div class="form-grid two-col">
+                <div class="field">
+                  <label for="signature">Electronic signature (type your full name)</label>
+                  <input id="signature" name="signature" type="text" maxlength="120" autocomplete="name" aria-describedby="err-consentSignatureFullName" />
+                  <p class="error-text" id="err-consentSignatureFullName"></p>
+                </div>
+                <div class="field">
+                  <label for="signatureDate">Date signed</label>
+                  <input id="signatureDate" name="signatureDate" type="date" readonly aria-describedby="err-consentSignatureDate" />
+                  <p class="error-text" id="err-consentSignatureDate"></p>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn--ghost" data-back="3">← Back</button>
+                <button type="submit" class="btn btn--primary" id="submit-btn">Create Account ✨</button>
+              </div>
+            </fieldset>
+          </form>
+
+          <p class="register__login-note">
+            Already play here? <a href="login.html">Sign in instead</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>Chika's Game Hub — accounts need a grown-up's permission.</div>
+      <div class="site-footer__links">
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <span>COPPA-friendly</span>
+      </div>
+      <div>© <span id="year"></span> Chika's Game Hub</div>
+    </footer>
+
+    <div class="modal-overlay" id="username-modal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="username-modal-title">
+        <span class="username-modal__star" aria-hidden="true">⭐</span>
+        <h2 class="modal__title" id="username-modal-title">Your play username is…</h2>
+        <p class="username-modal__name" id="generated-username"></p>
+        <p class="username-modal__hint">
+          Write it down! Grown-ups can also find it later in the Members Login area.
+          <span id="username-expiry"></span>
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--lime" id="accept-username">Accept ✓</button>
+          <button type="button" class="btn btn--danger" id="deny-username">Deny ✕</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

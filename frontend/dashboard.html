@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Dashboard — Chika's Game Hub</title>
+    <meta name="description" content="Choose a game, track your progress and play!" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/styles/base.css" />
+    <link rel="stylesheet" href="/src/styles/dashboard.css" />
+    <script type="module" src="/src/pages/dashboard.ts"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="topnav">
+      <a class="brand" href="index.html" aria-label="Chika's Game Hub home">Chika's Game Hub</a>
+      <nav aria-label="Primary">
+        <ul class="topnav__links">
+          <li><a href="dashboard.html" aria-current="page">Dashboard</a></li>
+          <li><a href="index.html#games">Games</a></li>
+          <li><a href="index.html">Home</a></li>
+        </ul>
+      </nav>
+      <div class="topnav__user">
+        <span class="topnav__player" id="nav-player">Player</span>
+        <button type="button" class="btn btn--ghost btn--small" id="logout-btn">Log out</button>
+      </div>
+    </header>
+
+    <main id="main" class="dashboard" hidden>
+      <section class="dash-hero card" aria-labelledby="dash-greeting">
+        <div class="dash-hero__who">
+          <span class="dash-hero__avatar" id="avatar" aria-hidden="true">C</span>
+          <div>
+            <h1 class="dash-hero__greeting" id="dash-greeting">Hi there!</h1>
+            <p class="dash-hero__meta" id="player-meta">—</p>
+            <div class="dash-hero__goals" id="player-goals"></div>
+          </div>
+        </div>
+        <div class="dash-hero__side">
+          <span class="badge" id="team-badge">Team</span>
+          <p class="dash-hero__date" id="today-date">—</p>
+          <p class="dash-hero__clock" id="live-clock">--:--</p>
+        </div>
+      </section>
+
+      <section class="dash-stats" aria-label="Overall progress">
+        <div class="stat card">
+          <span class="stat__value" id="stat-started">0</span>
+          <span class="stat__label">Games started</span>
+        </div>
+        <div class="stat card">
+          <span class="stat__value" id="stat-completed">0</span>
+          <span class="stat__label">Games finished</span>
+        </div>
+        <div class="stat card">
+          <span class="stat__value" id="stat-levels">0</span>
+          <span class="stat__label">Levels cleared</span>
+        </div>
+        <div class="stat card stat--wide">
+          <span class="stat__value" id="stat-percent">0%</span>
+          <span class="stat__label">Overall progress</span>
+          <div class="progress"><span class="progress__fill" id="overall-fill" style="width:0%"></span></div>
+        </div>
+      </section>
+
+      <div class="dash-status" id="dash-status" role="status">Picking your games…</div>
+
+      <div id="sections"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div>Chika's Game Hub — play, learn, shine.</div>
+      <div class="site-footer__links">
+        <a href="index.html">Home</a>
+        <button type="button" class="linklike" id="footer-storage">Storage &amp; reset</button>
+      </div>
+      <div>© <span id="year"></span> Chika's Game Hub</div>
+    </footer>
+
+    <div id="game-mount" hidden></div>
+
+    <div class="modal-overlay" id="instructions-modal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+        <button type="button" class="modal__close" id="instructions-close" aria-label="Close instructions">×</button>
+        <div class="instructions__head">
+          <span class="instructions__icon" id="instructions-icon" aria-hidden="true"></span>
+          <div>
+            <h2 class="modal__title" id="instructions-title">Game</h2>
+            <p class="instructions__tagline" id="instructions-tagline"></p>
+          </div>
+        </div>
+        <ol class="instructions__list" id="instructions-list"></ol>
+        <div class="instructions__meta" id="instructions-meta"></div>
+        <p class="instructions__hearts">You get 10 hearts — a wrong answer costs one. 💖</p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--lime" id="instructions-play">I Understand — Play!</button>
+          <button type="button" class="btn btn--ghost" id="instructions-cancel">Not yet</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="storage-modal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="storage-modal-title">
+        <button type="button" class="modal__close" id="storage-modal-close" aria-label="Close storage panel">×</button>
+        <h2 class="modal__title" id="storage-modal-title">Local Progress Storage</h2>
+        <p id="storage-modal-readout">—</p>
+        <p class="hint">
+          Progress is saved in this browser only. Resetting removes every saved level with no backup.
+        </p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--danger" id="storage-reset">Reset progress</button>
+          <button type="button" class="btn btn--ghost" id="storage-cancel">Close</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
