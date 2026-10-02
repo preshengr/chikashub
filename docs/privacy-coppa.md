@@ -53,12 +53,14 @@ location, no contacts/photos/microphone access.
   product-spec login message.
 - Per-IP rate limiting on auth and gameplay-event routes.
 - Gateway strips hop-by-hop headers, adds security headers, and never exposes backend errors.
-- SQL is parameterised throughout (better-sqlite3); schema constraints (`CHECK`, `FK`) as a
-  second line of defence.
+- All storage access goes through the typed `DataStore` layer — no string-built queries —
+  and Firestore security rules deny every client SDK access, so only the backend's Admin
+  SDK can read the data.
 
 ## Operator checklist
 
 - Run behind HTTPS in production (terminate TLS at the reverse proxy).
 - Set `SESSION_TTL_HOURS`, `PENDING_TTL_MINUTES` and `CORS_ORIGINS` deliberately.
-- Back up `CHIKA_DB` securely — it contains consent records; restrict file permissions.
+- Back up Firestore securely (console export or scheduled backups) — it contains consent
+  records.
 - Provide a contact method for guardians to request deletion of their child's data.

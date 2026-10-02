@@ -1,0 +1,57 @@
+# Chika's Game Hub — Netlify site (static MPA + /api proxy).
+# Before the first deploy: replace YOUR_BACKEND_URL below with your Firebase App
+# Hosting backend host (no https://, no trailing slash). See docs/deployment-live.md.
+
+[build]
+  command = "npm run build -w frontend"
+  publish = "frontend/dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# 1) API proxy — first match wins. force=true so /api never falls through to a file.
+#    Same-origin, so the backend needs no CORS changes.
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR_BACKEND_URL/api/:splat"
+  status = 200
+  force = true
+
+# 2) Named routes (mirrors the local gateway serving *.html for extension-less paths).
+#    Netlify ignores trailing slashes when matching these rules.
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/register.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+# 3) No SPA catch-all: unknown paths 404, same as the local gateway.
+
+# Security headers (mirrors gateway/src/server.ts).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "same-origin"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+# HTML must always revalidate (same as gateway Cache-Control: no-cache).
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache"

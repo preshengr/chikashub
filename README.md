@@ -69,7 +69,7 @@ frontend/src/
   styles/      base design system + per-page styles
 gateway/src/   static server + API proxy
 scripts/       smoke.ps1 end-to-end test
-docs/          API, database, local storage, privacy, deployment
+docs/          API, database, local storage, privacy, deployment, live deployment
 ```
 
 ## Documentation
@@ -79,6 +79,7 @@ docs/          API, database, local storage, privacy, deployment
 - [Browser local storage](docs/local-storage.md)
 - [Privacy & COPPA](docs/privacy-coppa.md)
 - [Setup & deployment](docs/deployment.md)
+- [Live deployment (GitHub + Netlify + App Hosting)](docs/deployment-live.md)
 
 ## Verification
 

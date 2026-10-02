@@ -27,7 +27,9 @@ Runs three watchers concurrently:
 
 Browse <http://localhost:5173> during development or <http://localhost:3000>.
 
-SQLite database defaults to `./data/chikas-hub.db` (created and migrated on first boot).
+Storage uses the in-memory `MemoryStore` by default (data resets on restart). Set
+`DATA_STORE=firestore` to persist to Cloud Firestore — see [database](database.md) and
+the [live deployment guide](deployment-live.md).
 
 ## Build
 
@@ -55,7 +57,7 @@ overriding. Otherwise expose the backend privately and point `API_TARGET` at it.
 | `NODE_ENV` | `development` | environment flag |
 | `PORT` | `3001` | API listen port |
 | `API_PREFIX` | `api` | global route prefix |
-| `CHIKA_DB` | `./data/chikas-hub.db` | SQLite file path |
+| `DATA_STORE` | `memory` | `memory` (local/tests) \| `firestore` (required in production) |
 | `SESSION_TTL_HOURS` | `24` | session lifetime |
 | `PENDING_TTL_MINUTES` | `30` | registration confirm window |
 | `CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000` | comma-separated allow-list |
@@ -80,7 +82,7 @@ npm run build
 powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1
 ```
 
-Boots a fresh backend (temp SQLite DB) + the gateway serving `frontend/dist`, then asserts
+Boots a fresh backend (in-memory store) + the gateway serving `frontend/dist`, then asserts
 20 checks: static pages, catalogue, validation rejection, full register → confirm → dashboard →
 event → progress → logout flow, revoked-token 401, and the exact login failure message.
 Ports 3000/3001 must be free (the script frees them) and `npm run build` must have run.
@@ -91,7 +93,8 @@ Ports 3000/3001 must be free (the script frees them) and `npm run build` must ha
 npm run typecheck && npm run test && npm run build
 ```
 
-- backend: Jest (143 tests — 114 unit + 29 integration in `test/api.e2e-spec.ts`)
+- backend: Jest (151 tests — 122 unit + 29 integration in `test/api.e2e-spec.ts`; 6
+  Firestore-emulator tests skip unless `FIRESTORE_EMULATOR_HOST` is set)
 - frontend: Vitest (50 tests)
 - gateway: `node:test` (4 tests)
 
@@ -99,6 +102,9 @@ npm run typecheck && npm run test && npm run build
 
 - Terminate TLS upstream; set `TRUST_PROXY=true` so rate limits see real client IPs.
 - Keep `frontend/dist` and `gateway/dist` on the gateway host; sync via your CI.
-- Persist `CHIKA_DB` on a volume and back it up (contains consent records).
+- Back up Firestore securely (console export or scheduled backups) — it contains consent
+  records.
 - The gateway already sends security headers and a typed 502 envelope; put it behind
   a conventional reverse proxy (nginx/Caddy) for TLS and gzip if needed.
+- For the managed live setup (GitHub + Netlify + Firebase App Hosting), follow the
+  [live deployment guide](deployment-live.md).
