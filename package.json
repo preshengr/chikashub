@@ -2,7 +2,7 @@
   "name": "chikas-game-hub",
   "version": "1.0.0",
   "private": true,
-  "description": "Chika's Game Hub - educational gaming platform for children ages 4-12",
+  "description": "Chika's Game Hub - Great Educational gaming platform for children ages 4-12",
   "workspaces": [
     "gateway",
     "backend",

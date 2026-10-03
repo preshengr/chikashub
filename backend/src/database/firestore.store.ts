@@ -52,6 +52,14 @@ function firestoreCredentialOptions(): AppOptions | undefined {
         '(Firebase console → Project settings → Service accounts).',
     );
   }
+  if (!(account.projectId ?? account.project_id)) {
+    throw new Error(
+      'FIRESTORE_SERVICE_ACCOUNT is missing "project_id" — the JSON was truncated or ' +
+        'edited. Paste the downloaded service-account key file verbatim, or regenerate ' +
+        'it (Firebase console → Project settings → Service accounts → Generate new ' +
+        'private key).',
+    );
+  }
   return { credential: cert(account) };
 }
 

@@ -103,6 +103,37 @@ function runStoreSuite(name: string, makeStore: () => DataStore | Promise<DataSt
 
 runStoreSuite('MemoryStore parity', () => new MemoryStore());
 
+describe('FirestoreStore credential validation', () => {
+  const original = process.env.FIRESTORE_SERVICE_ACCOUNT;
+  const account = {
+    project_id: 'demo-project',
+    client_email: 'demo@demo-project.iam.gserviceaccount.com',
+    private_key: 'not-a-real-key',
+  };
+
+  afterEach(() => {
+    if (original === undefined) delete process.env.FIRESTORE_SERVICE_ACCOUNT;
+    else process.env.FIRESTORE_SERVICE_ACCOUNT = original;
+  });
+
+  it('rejects FIRESTORE_SERVICE_ACCOUNT that is not valid JSON', () => {
+    process.env.FIRESTORE_SERVICE_ACCOUNT = '{ truncated paste';
+    expect(() => new FirestoreStore()).toThrow(/not valid JSON/);
+  });
+
+  it('rejects a key missing client_email or private_key', () => {
+    process.env.FIRESTORE_SERVICE_ACCOUNT = JSON.stringify({ project_id: account.project_id });
+    expect(() => new FirestoreStore()).toThrow(/client_email/);
+  });
+
+  it('rejects a key missing project_id instead of failing at the first query', () => {
+    const incomplete: Record<string, unknown> = { ...account };
+    delete incomplete.project_id;
+    process.env.FIRESTORE_SERVICE_ACCOUNT = JSON.stringify(incomplete);
+    expect(() => new FirestoreStore()).toThrow(/project_id/);
+  });
+});
+
 describeEmulator('FirestoreStore parity (emulator)', () => {
   runStoreSuite('FirestoreStore', () => new FirestoreStore());
 });
