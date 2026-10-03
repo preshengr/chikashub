@@ -98,6 +98,15 @@ function runStoreSuite(name: string, makeStore: () => DataStore | Promise<DataSt
         }),
       ).rejects.toThrow(DataExistsError);
     });
+
+    it('rejects a read after a write inside the same transaction', async () => {
+      await expect(
+        store.runTransaction(async (tx) => {
+          await tx.create('parity_probe/read_after_write', { order: 1 });
+          await tx.get('parity_probe/read_after_write');
+        }),
+      ).rejects.toThrow(/all reads to be executed before all writes/);
+    });
   });
 }
 

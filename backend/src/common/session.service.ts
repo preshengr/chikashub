@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger as NestLogger } from '@nestjs/common';
 import { createHash, randomBytes } from 'node:crypto';
-import { DATA_STORE, type DataStore, type StoreScope } from '../database/data-store';
+import { DATA_STORE, type DataStore, type Doc, type StoreScope } from '../database/data-store';
 import { ApiException, ErrorCode } from './api-error';
 
 export interface SessionUser {
@@ -37,9 +37,10 @@ export class SessionService {
   async create(
     username: string,
     scope: StoreScope = this.store,
+    userDoc?: Doc<{ childId: string }> | null,
   ): Promise<{ token: string; expiresIn: number; expiresAt: string }> {
-    const userDoc = await scope.get<{ childId: string }>(`usernames/${username}`);
-    if (!userDoc) throw ApiException.userNotFound();
+    const doc = userDoc !== undefined ? userDoc : await scope.get<{ childId: string }>(`usernames/${username}`);
+    if (!doc) throw ApiException.userNotFound();
 
     const token = randomBytes(32).toString('base64url');
     const hash = SessionService.hashToken(token);
@@ -48,7 +49,7 @@ export class SessionService {
 
     await scope.create(`sessions/${hash}`, {
       username,
-      childId: userDoc.data.childId,
+      childId: doc.data.childId,
       createdAt: now,
       expiresAt,
       lastSeenAt: now,

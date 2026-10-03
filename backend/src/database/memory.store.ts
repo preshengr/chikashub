@@ -130,7 +130,34 @@ export class MemoryStore implements DataStore {
   }
 
   async runTransaction<T>(fn: (tx: StoreScope) => Promise<T>): Promise<T> {
-    return fn(this);
+    const store = this;
+    let wrote = false;
+    const scope: StoreScope = {
+      async get<T>(path: string): Promise<Doc<T> | undefined> {
+        if (wrote) {
+          throw new Error(
+            'Firestore transactions require all reads to be executed before all writes.',
+          );
+        }
+        return store.get(path);
+      },
+      async create<T>(path: string, data: T): Promise<void> {
+        wrote = true;
+        return store.create(path, data);
+      },
+      async set<T>(path: string, data: T, options?: { merge?: boolean }): Promise<void> {
+        wrote = true;
+        return store.set(path, data, options);
+      },
+      async delete(path: string): Promise<void> {
+        wrote = true;
+        return store.delete(path);
+      },
+      generateId(): string {
+        return store.generateId();
+      },
+    };
+    return fn(scope);
   }
 
   clear(): void {

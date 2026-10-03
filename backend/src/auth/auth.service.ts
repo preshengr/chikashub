@@ -56,6 +56,13 @@ export class AuthService {
         const now = new Date().toISOString();
         const parentPath = `parents/${email}`;
         const parentDoc = await tx.get(parentPath);
+        const username = await this.usernames.generateUnique(dto.child.firstName, { scope: tx });
+        const prefix = username.slice(0, 3);
+        const prefixDoc = await tx.get<{ count: number }>(`usernamePrefixes/${prefix}`);
+        const childId = tx.generateId();
+        const expiresAt = new Date(
+          Date.now() + this.config.pendingRegistrationTtlMinutes * 60_000,
+        ).toISOString();
 
         if (!parentDoc) {
           await tx.create(parentPath, {
@@ -81,7 +88,6 @@ export class AuthService {
           );
         }
 
-        const childId = tx.generateId();
         await tx.create(`children/${childId}`, {
           parentId: email,
           firstName: dto.child.firstName.trim(),
@@ -98,20 +104,14 @@ export class AuthService {
           createdAt: now,
           updatedAt: now,
         });
-
-        const username = await this.usernames.generateUnique(dto.child.firstName, { scope: tx });
         await tx.create(`usernames/${username}`, {
           childId,
           status: 'pending',
-          prefix: username.slice(0, 3),
+          prefix,
           createdAt: now,
           activatedAt: null,
         });
-        await this.usernames.recordPrefix(username, tx);
-
-        const expiresAt = new Date(
-          Date.now() + this.config.pendingRegistrationTtlMinutes * 60_000,
-        ).toISOString();
+        await this.usernames.recordPrefix(username, tx, prefixDoc ?? null);
         await tx.create(`pending/${username}`, { expiresAt, createdAt: now });
 
         this.logger.log(
@@ -148,9 +148,9 @@ export class AuthService {
 
         if (!pendingDoc) {
           if (usernameDoc?.data.status === 'active') {
-            const session = await this.sessions.create(username, tx);
             const profile = await loadProfile(tx, username);
             if (!profile) throw ApiException.userNotFound();
+            const session = await this.sessions.create(username, tx, usernameDoc);
             return { username, profile, ...session };
           }
           throw new ApiException(
@@ -172,6 +172,9 @@ export class AuthService {
           throw ApiException.internal('Staged registration is missing account data');
         }
 
+        const profile = await loadProfile(tx, username);
+        if (!profile) throw ApiException.internal('Account could not be loaded after activation');
+
         const now = new Date().toISOString();
         await tx.set(`usernames/${username}`, { status: 'active', activatedAt: now }, { merge: true });
         await tx.set(
@@ -180,12 +183,14 @@ export class AuthService {
           { merge: true },
         );
         await tx.delete(`pending/${username}`);
+        const session = await this.sessions.create(username, tx, usernameDoc);
 
-        const session = await this.sessions.create(username, tx);
-        const profile = await loadProfile(tx, username);
-        if (!profile) throw ApiException.internal('Account could not be loaded after activation');
         this.logger.log(`Registration confirmed for username=${username}`);
-        return { username, profile, ...session };
+        return {
+          username,
+          profile: { ...profile, status: 'active' as const },
+          ...session,
+        };
       });
     } catch (err) {
       this.rethrowAsApi('confirm', err);
@@ -204,10 +209,13 @@ export class AuthService {
           this.logger.warn(`Deny requested for active username=${username} - ignored`);
           return false;
         }
+        const prefixDoc = await tx.get<{ count: number }>(
+          `usernamePrefixes/${usernameDoc.data.prefix}`,
+        );
         await tx.delete(`children/${usernameDoc.data.childId}`);
         await tx.delete(`usernames/${username}`);
         await tx.delete(`pending/${username}`);
-        await this.usernames.releasePrefix(usernameDoc.data.prefix, tx);
+        await this.usernames.releasePrefix(usernameDoc.data.prefix, tx, prefixDoc ?? null);
         this.logger.log(`Staged registration denied and removed: username=${username}`);
         return true;
       });
@@ -266,10 +274,13 @@ export class AuthService {
   private async removeStaged(username: string): Promise<void> {
     await this.store.runTransaction(async (tx) => {
       const usernameDoc = await tx.get<UsernameRecord>(`usernames/${username}`);
+      const prefixDoc = usernameDoc
+        ? await tx.get<{ count: number }>(`usernamePrefixes/${usernameDoc.data.prefix}`)
+        : undefined;
       if (usernameDoc) {
         await tx.delete(`children/${usernameDoc.data.childId}`);
         await tx.delete(`usernames/${username}`);
-        await this.usernames.releasePrefix(usernameDoc.data.prefix, tx);
+        await this.usernames.releasePrefix(usernameDoc.data.prefix, tx, prefixDoc ?? null);
       }
       await tx.delete(`pending/${username}`);
     });

@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger as NestLogger } from '@nestjs/common';
 import { randomInt } from 'node:crypto';
-import { DATA_STORE, type DataStore, type StoreScope } from '../database/data-store';
+import { DATA_STORE, type DataStore, type Doc, type StoreScope } from '../database/data-store';
 import { ApiException, ErrorCode } from '../common/api-error';
 
 export interface UsernamePrefixes {
@@ -106,25 +106,33 @@ export class UsernameService {
     return candidate;
   }
 
-  async recordPrefix(username: string, scope: StoreScope): Promise<void> {
+  async recordPrefix(
+    username: string,
+    scope: StoreScope,
+    existing?: Doc<{ count: number }> | null,
+  ): Promise<void> {
     const prefix = username.slice(0, 3);
     const path = `usernamePrefixes/${prefix}`;
-    const existing = await scope.get<{ count: number }>(path);
+    const doc = existing !== undefined ? existing : await scope.get<{ count: number }>(path);
     await scope.set(
       path,
-      { prefix, count: (existing?.data.count ?? 0) + 1, updatedAt: new Date().toISOString() },
+      { prefix, count: (doc?.data.count ?? 0) + 1, updatedAt: new Date().toISOString() },
       { merge: true },
     );
   }
 
-  async releasePrefix(prefix: string, scope: StoreScope): Promise<void> {
+  async releasePrefix(
+    prefix: string,
+    scope: StoreScope,
+    existing?: Doc<{ count: number }> | null,
+  ): Promise<void> {
     const path = `usernamePrefixes/${prefix}`;
-    const existing = await scope.get<{ count: number }>(path);
-    if (!existing) return;
-    if ((existing.data.count ?? 1) <= 1) {
+    const doc = existing !== undefined ? existing : await scope.get<{ count: number }>(path);
+    if (!doc) return;
+    if ((doc.data.count ?? 1) <= 1) {
       await scope.delete(path);
     } else {
-      await scope.set(path, { count: existing.data.count - 1 }, { merge: true });
+      await scope.set(path, { count: doc.data.count - 1 }, { merge: true });
     }
   }
 }
