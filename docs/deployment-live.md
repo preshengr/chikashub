@@ -199,6 +199,7 @@ Notes:
 | Backend boot error `FIRESTORE_SERVICE_ACCOUNT is not valid JSON…` | JSON pasted with truncation/extra text — paste the key file contents exactly; re-download if unsure. |
 | Backend boot error `Failed to initialise Cloud Firestore…` | Key revoked (rotate in Firebase), wrong project, or variable missing. |
 | Build fails: `tsc: command not found` / missing typescript | `NODE_ENV=production` was set manually and pruned devDependencies — remove it. |
+| Boot crash: `Cannot find module '@google-cloud/firestore'` | The build ran on Node <22 (firebase-admin's Firestore driver requires Node ≥22 and is skipped on older runtimes). The root `engines.node` is `>=22` so Railpack must pick ≥22 — check the Node version in the build log. |
 | Deployment 502 "application failed to respond" | App didn't bind Railway's `PORT`, or crashed — check Deploy Logs. If the port looks wrong, verify the healthcheck path matches your routes. |
 | Rate limiting blocks a shared office NAT (429) | Expected per-IP behaviour; tune `RL_AUTH_MAX` / `RL_EVENT_MAX` on the backend if needed. |
 | Registration works but confirmation link wrong | Email links are built from the origin the request arrived on — test the flow through the final frontend domain. |
